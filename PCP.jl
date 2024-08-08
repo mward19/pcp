@@ -5,8 +5,8 @@ using ProgressMeter
 
 export PCP
 
-""" Implements Algorithm 5.1 from section 5.2.1 of Wright & Ma. """
-function PCP(𝐘, λ, μ, maxiter=100, ϵ=1e-2)
+""" Implements PCP by ADMM (Alternating Directions Method of Multipliers). """
+function PCP(𝐘, λ, μ; maxiter=100, ϵ=1e-2)
     # Define necessary functions for the algorithm.
     relu(x) = max(x, 0)
     𝒮(τ, 𝐌) = sign.(𝐌) .* relu.(abs.(𝐌) .- τ)
@@ -27,8 +27,8 @@ function PCP(𝐘, λ, μ, maxiter=100, ϵ=1e-2)
     𝐋_old = nothing
     𝐒_old = 𝐒
 
-    # Perform Algorithm 5.1
-    @showprogress "Iterating..." for iter in 1:maxiter
+    # Perform ADMM algorithm
+    @showprogress "Performing PCP..." for iter in 1:maxiter
         𝐋 = 𝒟(1/μ,  𝐘 - 𝐒 - 1/μ * 𝚲)
         𝐒 = 𝒮(λ/μ,  𝐘 - 𝐋 - 1/μ * 𝚲)
         𝚲 = 𝚲 + μ * (𝐋 + 𝐒 - 𝐘)

@@ -13,7 +13,7 @@ function make_flowers(background_img, poss_vals=LinRange(0, 1, 1000), N_flowers=
     
     centers = [img_dims .* [rand(), rand()] for flower in 1:N_flowers]
     
-    possible_radii = LinRange(min(img_dims...) / 100, min(img_dims...) / 20, 1000)
+    possible_radii = LinRange(min(img_dims...) / 100, min(img_dims...) / 10, 1000)
     radii = [rand(possible_radii) for flower in 1:N_flowers]
 
     possible_puffiness_scales = LinRange(1, 5, 500)
