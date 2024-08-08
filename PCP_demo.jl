@@ -55,7 +55,7 @@ end
 function gif_from_frames(frames, fps=20)
     # Convert frames into 3D array
     array = cat(frames...; dims=3) |> rescale
-    save("demo.gif", array; fps=fps)
+    save("temp/demo.gif", array; fps=fps)
 end
 
 
