@@ -1,5 +1,5 @@
 # Principal Component Pursuit
-This code is an implementation and demo of Principal Component Pursuit, as applied to an image background removal problem. The algorithm is based on section 5.2 of John Wright & Yi Ma's *High-Dimensional Data Analysis with Low-Dimensional Models* [Wright & Ma, 2022].
+This code is an implementation and demo of Principal Component Pursuit, as applied to an image background extraction problem. The algorithm is based on section 5.2 of John Wright & Yi Ma's *High-Dimensional Data Analysis with Low-Dimensional Models* [Wright & Ma, 2022].
 
 The algorithm represents a video as a matrix in which each column is a flattened frame of the video. We assume that the video mostly contains a static background, and a few things moving or changing in the foreground. Using convex optimization, we separate the video matrix into a low-rank component and a sparse component -- or in other words, a background component, and a foreground component.
 
