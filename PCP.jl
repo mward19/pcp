@@ -5,7 +5,10 @@ using ProgressMeter
 
 export PCP
 
-""" Implements PCP by ADMM (Alternating Directions Method of Multipliers). """
+""" 
+Implements Principal Component Analysis by ADMM (Alternating Directions Method
+of Multipliers).
+"""
 function PCP(𝐘, λ, μ; maxiter=100, ϵ=1e-2)
     # Define necessary functions for the algorithm.
     relu(x) = max(x, 0)
@@ -22,7 +25,8 @@ function PCP(𝐘, λ, μ; maxiter=100, ϵ=1e-2)
     𝐒 = zeros(size(𝐘))
     𝚲 = zeros(size(𝐘))
 
-    # Save old variables to check convergence condition, and force scope outside loop
+    # Save old variables to check convergence condition, and force scope outside
+    # loop
     𝐋 = nothing
     𝐋_old = nothing
     𝐒_old = 𝐒
