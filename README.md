@@ -1,7 +1,7 @@
 # Brief summary
 I was looking for ways to work with and extract information from noisy 3-dimensional images of bacteria called tomograms. I read a book about ways of making the most of messy data using linear algebra and optimization<sup>1</sup>. In the process, I learned about Principal Component Pursuit. 
 
-Here I apply Principle Component Pursuit to a video I shot in my lab. Using this method, I am able to extract the background and foreground of a video, using nothing more than linear algebra and a simple convex optimization problem.
+Here I apply Principal Component Pursuit to a video I shot in my lab. Using this method, I am able to extract the background and foreground of a video, using nothing more than linear algebra and a simple convex optimization problem.
 
 ![pcp demo](./demo.gif)
 
