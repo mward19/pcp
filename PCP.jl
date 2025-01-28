@@ -7,8 +7,8 @@ export PCP
 
 """ 
 Implements Principal Component Analysis by ADMM (Alternating Directions Method
-of Multipliers). See section "Note on Unicode" near the end of README.md for discussion about the
-strange choices of symbols here.
+of Multipliers). See section "Note on Unicode" near the end of README.md for
+discussion about the strange choices of symbols here.
 """
 function PCP(𝐘, λ, μ; maxiter=100, ϵ=1e-2)
     # Define necessary functions for the algorithm.
