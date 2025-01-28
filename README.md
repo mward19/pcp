@@ -79,7 +79,7 @@ For more formal justification for these choices of norm, consult Wright and Ma's
 
 The code should be viewed with a font capable of handling mathematical Unicode characters like 𝒮, ϵ, and 𝐕ᵀ. I don't generally code this way, but since Julia offers the support, I thought I'd experiment with making the code match the book's notation. [Not everyone agrees with this practice](https://discourse.julialang.org/t/unicode-a-bad-idea-in-general/). Below is a comparison of the ADMM algorithm pseudocode in Wright & Ma's book and my implementation in `PCP.jl`. Julia makes this kind of mathematical coding easy.
 
-![Comparing algorithm to code](unicode-2.png)
+![Comparing algorithm to code](unicode.png)
 
 ## References
 
