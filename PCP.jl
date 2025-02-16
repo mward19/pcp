@@ -19,7 +19,7 @@ function PCP(𝐘, λ, μ; maxiter=100, ϵ=1e-2)
         𝐔, 𝚺, 𝐕ᵀ = (F.U, F.S, F.Vt)
         return 𝐔 * 𝒮(τ, diagm(𝚺)) * 𝐕ᵀ
     end
-    nuclearnorm(𝐌) = sqrt.(tr(𝐌' * 𝐌))
+     nuclearnorm(𝐌) = sqrt.(tr(𝐌' * 𝐌))
     objective(𝐋, 𝐒) = nuclearnorm(𝐋) + λ*norm(𝐒, 1)
 
     # Initialize variables
@@ -40,7 +40,8 @@ function PCP(𝐘, λ, μ; maxiter=100, ϵ=1e-2)
 
         # Check for convergence
         curr_obj = objective(𝐋, 𝐒)
-        if iter > 1 && abs(curr_obj - objective(𝐋_old, 𝐒_old)) < ϵ
+        error = iter == 1 ? Inf : abs(curr_obj - objective(𝐋_old, 𝐒_old))  
+        if error < ϵ
             return 𝐋, 𝐒
         end
         

@@ -2,18 +2,13 @@ using Images
 using Random
 using LinearAlgebra
 using TestImages
-
 using VideoIO
 using FileIO
-using Images
-
 using ProgressMeter
-
 using Plots
 
 include("PCP.jl")
 using .PCP_by_ADMM
-
 
 """ Convert a video file into a vector of grayscale image frame matrices. """
 function video_to_frames(filename::String)
@@ -32,25 +27,29 @@ function video_to_frames(filename::String)
     return gray_frames
 end
 
-""" Convert a vector of image frames into a gif file. """
-function gif_from_frames(frames, fps=20)
-    # Convert frames into 3D array
-    array = cat(frames...; dims=3)
-    save("temp/demo.gif", array; fps=fps)
+""" Converts an MP4 video to a GIF using FFmpeg. """
+function mp4_to_gif(input_mp4::String, output_gif::String)
+    palette="/tmp/palette.png"
+
+    # Generate a color palette from the video
+    run(`ffmpeg -y -i $input_mp4 -vf "palettegen" $palette`)
+
+    # Convert video to GIF using the generated palette
+    run(`ffmpeg -y -i $input_mp4 -i $palette -filter_complex "paletteuse" $output_gif`)
 end
 
-""" 
-Vectorizes each image in `images`, returning a matrix in which each column is an
-image.
-"""
+""" Convert a vector of image frames into a gif file with a specified save path. """
+function gif_from_frames(frames; save_path="output.gif", fps=20)
+    # Convert frames into 3D array
+    array = cat(frames...; dims=3)
+    save(save_path, array; fps=fps)
+end
+
+""" Vectorizes each image in `images`, returning a matrix where each column is an image. """
 function vectorize_images(images::AbstractVector)
     n_images = length(images)
     img_dims = size(images[begin])
-
-    # The target matrix 𝐘 has a full image in each column. Vectorize the images
-    # and horizontally concatenate to construct the target matrix 𝐘.
-    𝐘 = hcat([Float64.(vec(image)) for image in images]...)
-    
+    𝐘 = hcat([Float64.(vec(image)) for image in images]...)  # Vectorize images and concatenate
     return 𝐘
 end
 
@@ -61,27 +60,52 @@ end
 
 """ Rescales an array between 0 and 1. """
 function rescale(array)
-    min_val = findmin(array)[1]
-    max_val = findmax(array)[1]
+    min_val, max_val = extrema(array)
     return (array .- min_val) ./ (max_val - min_val)
 end
 
 """ Forces the number `x` between floor and ceil. """
 function force_between(x; floor=0, ceil=1)
-    if x < floor
-        return floor
-    elseif x > ceil
-        return ceil
-    else
-        return x
+    return clamp(x, floor, ceil)
+end
+
+""" Creates an animated plot showing movement over time. """
+function animate_movement(𝐒::Matrix; fps=20, save_path="movement.gif")
+    frame_indices = 1:size(𝐒, 2)
+    movement_metric = [norm(frame, 0) for frame in eachcol(𝐒)]
+
+    anim = @animate for i in eachindex(frame_indices)
+        plot(
+            frame_indices, movement_metric;
+            title="Nonzero elements in the sparse\n (foreground) component of video",
+            label="Nonzero elements",
+            lw=2
+        )
+        scatter!([frame_indices[i]], [movement_metric[i]], color=:red, markersize=6, label="Current position")
     end
+
+    gif(anim, save_path, fps=fps)
+end
+
+""" Concatenates two GIFs side by side using FFmpeg, resizing the second GIF to match the first. """
+function concatenate_gifs(gif1::String, gif2::String, output_gif::String)
+    # Get height from the first GIF
+    height = strip(read(`ffprobe -v error -select_streams v:0 -show_entries stream=height -of csv=p=0 $gif1`, String))
+    
+    # FFmpeg command with proper palette handling
+    run(`ffmpeg -y -i $gif1 -i $gif2 -filter_complex "
+        [1:v]scale=-1:$height:flags=lanczos,setsar=1[scaled];
+        [0:v][scaled]hstack=inputs=2,split=2[stack][pal];
+        [pal]palettegen=reserve_transparent=on[palette];
+        [stack][palette]paletteuse
+        " -loop 0 $output_gif`)
 end
 
 """
-Perform a demo of PCP on a video file, separating the static parts from the
-changing parts.
+A demo of PCP on a video file, separating the static parts from the changing
+parts and showing when the algorithm sees the most movement.
 """
-function demo(filename::String)
+function motion_detection_demo(filename::String)
     frames = video_to_frames(filename)
     image_size = size(frames[begin])
     n_images = length(frames)
@@ -89,20 +113,31 @@ function demo(filename::String)
 
     # Hyperparameters for PCP (Principal Component Pursuit). 
     λ = 1/√max(*(image_size...), n_images)
-    μ = 1/10
+    μ = 1/100
     # Decompose 𝐘 into a low-rank component (𝐋) and a sparse component (𝐒)
     # with PCP.
-    𝐋, 𝐒 = PCP(𝐘, λ, μ; maxiter=10, ϵ=1)
-    # Recover images from 𝐋 and 𝐒.
+    𝐋, 𝐒 = PCP(𝐘, λ, μ; maxiter=15, ϵ=1e-2 * max(image_size...))
+    
+    # Recover images
     𝐋_images = devectorize_images(force_between.(𝐋), image_size)
     𝐒_images = devectorize_images(rescale(𝐒), image_size)
 
     # Concatenate result images for easy viewing
     display_frames = [vcat(Y, L, S) for (Y, L, S) in zip(frames, 𝐋_images, 𝐒_images)]
-    gif_from_frames(display_frames)
+
+    @info "Creating GIF animations..."
+
+    frames_gif_path = "temp/frames.gif"
+    movement_gif_path = "temp/movement.gif"
+    final_gif_path = "temp/final_output.gif"
+
+    gif_from_frames(display_frames, save_path=frames_gif_path)
+    animate_movement(𝐒, save_path=movement_gif_path)
+
+    # Concatenate GIFs horizontally
+    concatenate_gifs(movement_gif_path, frames_gif_path, final_gif_path)
 
     return 𝐘, 𝐋, 𝐒
 end
 
-
-
+𝐘, 𝐋, 𝐒 = motion_detection_demo("walking.mp4")
