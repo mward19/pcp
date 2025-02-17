@@ -162,4 +162,4 @@ function motion_detection_demo(filename::String, title::String)
     return 𝐘, 𝐋, 𝐒
 end
 
-𝐘, 𝐋, 𝐒 = motion_detection_demo("fridge.mp4", "fridge")
+𝐘, 𝐋, 𝐒 = motion_detection_demo("walking.mp4", "walking")
