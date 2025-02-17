@@ -9,6 +9,10 @@ Here I apply Principal Component Pursuit to a video I shot in my lab. Using this
  - The middle video is the "background" (not moving) component of the video.
  - The bottom video is the "foreground" (moving) component of the video.
 
+One can use such a decomposition in a number of ways. One is to detect and quantify motion, as depicted in the below video.
+
+<video src="walking movement demo.mp4" width="450" controls></video>
+
 I have yet to successfully apply this method to tomograms, but my advisor and I thought it was fascinating, so we feel like we succeeded anyway! If you would like to learn more details, read the longer summary below.
 
 # Longer summary
