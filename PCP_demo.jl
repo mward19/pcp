@@ -162,4 +162,4 @@ function motion_detection_demo(filename::String, title::String)
     return 𝐘, 𝐋, 𝐒
 end
 
-𝐘, 𝐋, 𝐒 = motion_detection_demo("walking.mp4", "walking")
+𝐘, 𝐋, 𝐒 = motion_detection_demo("tomogram axis 1.mp4", "tomogram axis 1")
